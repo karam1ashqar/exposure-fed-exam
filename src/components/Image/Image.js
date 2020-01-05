@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import FontAwesome from 'react-fontawesome';
-import './Image.scss';
+import React from "react";
+import PropTypes from "prop-types";
+import FontAwesome from "react-fontawesome";
+import "./Image.scss";
 
 class Image extends React.Component {
   static propTypes = {
@@ -13,15 +13,16 @@ class Image extends React.Component {
     super(props);
     this.calcImageSize = this.calcImageSize.bind(this);
     this.state = {
+      flippedImage: false,
       size: 200
     };
   }
 
   calcImageSize() {
-    const {galleryWidth} = this.props;
+    const { galleryWidth } = this.props;
     const targetSize = 200;
     const imagesPerRow = Math.round(galleryWidth / targetSize);
-    const size = (galleryWidth / imagesPerRow);
+    const size = galleryWidth / imagesPerRow;
     this.setState({
       size
     });
@@ -34,21 +35,53 @@ class Image extends React.Component {
   urlFromDto(dto) {
     return `https://farm${dto.farm}.staticflickr.com/${dto.server}/${dto.id}_${dto.secret}.jpg`;
   }
-
+  flipImage = () => {
+    this.setState({
+      flippedImage: !this.state.flippedImage
+    });
+  };
   render() {
     return (
       <div
         className="image-root"
         style={{
           backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
-          width: this.state.size + 'px',
-          height: this.state.size + 'px'
+          width: this.state.size + "px",
+          height: this.state.size + "px",
+          transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
         }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: this.state.flippedImage ? "row-reverse" : "row"
+          }}
         >
-        <div>
-          <FontAwesome className="image-icon" name="arrows-alt-h" title="flip"/>
-          <FontAwesome className="image-icon" name="clone" title="clone"/>
-          <FontAwesome className="image-icon" name="expand" title="expand"/>
+          <FontAwesome
+            style={{
+              transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
+            }}
+            onClick={this.flipImage}
+            className="image-icon"
+            name="arrows-alt-h"
+            title="flip"
+          />
+          <FontAwesome
+            style={{
+              transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
+            }}
+            className="image-icon"
+            name="clone"
+            title="clone"
+          />
+          <FontAwesome
+            style={{
+              transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
+            }}
+            className="image-icon"
+            name="expand"
+            title="expand"
+          />
         </div>
       </div>
     );
