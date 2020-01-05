@@ -13,6 +13,7 @@ class Gallery extends React.Component {
     super(props);
     this.state = {
       images: [],
+      onlyFavroites: false,
       galleryWidth: this.getGalleryWidth()
     };
   }
@@ -65,19 +66,43 @@ class Gallery extends React.Component {
   };
 
   render() {
+    const { onlyFavroites } = this.state;
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
     return (
       <div className="gallery-root">
-        {this.state.images.map((dto, key) => {
-          return (
-            <Image
-              key={"image-" + dto.id + key}
-              dto={dto}
-              viewInLarge={() => this.props.viewImageLarge(dto)}
-              duplicateImage={() => this.cloneImage(dto)}
-              galleryWidth={this.state.galleryWidth}
-            />
-          );
-        })}
+        <button
+          onClick={() =>
+            this.setState({
+              onlyFavroites: !onlyFavroites
+            })
+          }
+          className="btnFavorite"
+        >
+          {onlyFavroites ? "Show all" : "Show Only Favorites"}
+        </button>
+        {!onlyFavroites
+          ? this.state.images.map((dto, key) => {
+              return (
+                <Image
+                  key={"image-" + dto.id + key}
+                  dto={dto}
+                  viewInLarge={() => this.props.viewImageLarge(dto)}
+                  duplicateImage={() => this.cloneImage(dto)}
+                  galleryWidth={this.state.galleryWidth}
+                />
+              );
+            })
+          : favorites.map((dto, key) => {
+              return (
+                <Image
+                  key={"image-" + dto.id + key}
+                  dto={dto}
+                  viewInLarge={() => this.props.viewImageLarge(dto)}
+                  duplicateImage={() => this.cloneImage(dto)}
+                  galleryWidth={this.state.galleryWidth}
+                />
+              );
+            })}
       </div>
     );
   }

@@ -8,6 +8,22 @@
   color: white;
   font-size: 20pt;
 }
+.btnFavorite {
+  display: block;
+  margin: 15px auto;
+  background: white;
+  outline: none;
+  transition: color 0.4s ease, background 0.4s ease;
+  color: black;
+  border: 1px black solid;
+  padding: 5px 40px;
+  cursor: pointer;
+
+  &:hover {
+    background: black;
+    color: white;
+  }
+}
 
 .gallery-intro {
   font-size: 15pt;

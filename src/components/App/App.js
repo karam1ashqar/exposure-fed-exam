@@ -31,6 +31,7 @@ class App extends React.Component {
             value={this.state.tag}
           />
         </div>
+
         <Gallery
           viewImageLarge={dto => this.viewImageInLarge(dto)}
           tag={this.state.tag}
