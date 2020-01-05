@@ -22,6 +22,7 @@ class Gallery extends React.Component {
       onlyFavroites: false,
       numberPerPage: 100,
       loadingOpacity: 0,
+      reOrder: false,
       fetching: false,
       galleryWidth: this.getGalleryWidth()
     };
@@ -110,7 +111,7 @@ class Gallery extends React.Component {
   };
 
   render() {
-    const { onlyFavroites, fetching } = this.state;
+    const { onlyFavroites, fetching, reOrder } = this.state;
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
     const SortableItem = sortableElement(({ key, dto }) => (
@@ -130,7 +131,7 @@ class Gallery extends React.Component {
       return (
         <ul style={{ listStyle: "none" }}>
           {items.map((dto, key) => (
-            <SortableItem dto={dto} index={key} key={key} />
+            <SortableItem disabled={!reOrder} dto={dto} index={key} key={key} />
           ))}
         </ul>
       );
@@ -138,16 +139,28 @@ class Gallery extends React.Component {
 
     return (
       <div className="gallery-root">
-        <button
-          onClick={() =>
-            this.setState({
-              onlyFavroites: !onlyFavroites
-            })
-          }
-          className="btnFavorite"
-        >
-          {onlyFavroites ? "Show all" : "Show Only Favorites"}
-        </button>
+        <div style={{ display: "flex", maxWidth: "50%", margin: "auto" }}>
+          <button
+            onClick={() =>
+              this.setState({
+                onlyFavroites: !onlyFavroites
+              })
+            }
+            className="btnFavorite"
+          >
+            {onlyFavroites ? "Show all" : "Show Only Favorites"}
+          </button>
+          <button
+            onClick={() =>
+              this.setState({
+                reOrder: !reOrder
+              })
+            }
+            className="btnFavorite"
+          >
+            {!reOrder ? "Enable re-order" : "Disable re-order"}
+          </button>
+        </div>
         <div
           className="loading"
           style={{ visibility: fetching ? "visible" : "hidden" }}

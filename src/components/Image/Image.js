@@ -83,37 +83,13 @@ class Image extends React.Component {
     });
   };
 
-  onDragStart = (event, taskName) => {
-    console.log("dragstart on div: ", taskName);
-    event.dataTransfer.setData("text/html", event.parentNode);
-    event.dataTransfer.setDragImage(event.parentNode, 20, 20);
-  };
-  onDragOver = event => {
-    event.preventDefault();
-  };
-
-  onDrop = (event, cat) => {
-    let taskName = event.dataTransfer.getData("taskName");
-
-    let tasks = this.state.tasks.filter(task => {
-      if (task.taskName == taskName) {
-        task.type = cat;
-      }
-      return task;
-    });
-
-    this.setState({
-      ...this.state,
-      tasks
-    });
-  };
-
   render() {
     const { hearted, flippedImage, size, status, txtOpacity } = this.state;
     return (
       <div
         className="image-root"
         style={{
+          zIndex: 100,
           backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
           width: size + "px",
           height: size + "px",
