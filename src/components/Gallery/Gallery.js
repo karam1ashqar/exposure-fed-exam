@@ -1,8 +1,10 @@
 import React from "react";
+import FontAwesome from "react-fontawesome";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Image from "../Image";
 import "./Gallery.scss";
+import ReactDOM from "react-dom";
 
 class Gallery extends React.Component {
   static propTypes = {
@@ -14,6 +16,9 @@ class Gallery extends React.Component {
     this.state = {
       images: [],
       onlyFavroites: false,
+      numberPerPage: 100,
+      loadingOpacity: 0,
+      fetching: false,
       galleryWidth: this.getGalleryWidth()
     };
   }
@@ -25,33 +30,56 @@ class Gallery extends React.Component {
       return 1000;
     }
   }
-  getImages(tag) {
-    const getImagesUrl = `services/rest/?method=flickr.photos.search&api_key=522c1f9009ca3609bcbaf08545f067ad&tags=${tag}&tag_mode=any&per_page=100&format=json&safe_search=1&nojsoncallback=1`;
-    const baseUrl = "https://api.flickr.com/";
-    axios({
-      url: getImagesUrl,
-      baseURL: baseUrl,
-      method: "GET"
-    })
-      .then(res => res.data)
-      .then(res => {
-        if (
-          res &&
-          res.photos &&
-          res.photos.photo &&
-          res.photos.photo.length > 0
-        ) {
-          this.setState({ images: res.photos.photo });
-        }
+  getImages = (tag, number = this.state.numberPerPage) => {
+    if (!this.state.fetching) {
+      this.setState({ fetching: true }, () => {
+        const getImagesUrl = `services/rest/?method=flickr.photos.search&api_key=522c1f9009ca3609bcbaf08545f067ad&tags=${tag}&tag_mode=any&per_page=${number}&format=json&safe_search=1&nojsoncallback=1`;
+        const baseUrl = "https://api.flickr.com/";
+        axios({
+          url: getImagesUrl,
+          baseURL: baseUrl,
+          method: "GET"
+        })
+          .then(res => res.data)
+          .then(res => {
+            if (
+              res &&
+              res.photos &&
+              res.photos.photo &&
+              res.photos.photo.length > 0
+            ) {
+              this.setState({
+                images: res.photos.photo,
+                fetching: false,
+                numberPerPage: number
+              });
+            }
+          })
+          .catch(() => this.setState({ fetching: false }));
       });
-  }
+    }
+  };
 
   componentDidMount() {
     this.getImages(this.props.tag);
     this.setState({
       galleryWidth: document.body.clientWidth
     });
+
+    this.checkScroll();
   }
+
+  checkScroll = () =>
+    setInterval(() => {
+      if (typeof this.lastcomp !== "undefined") {
+        const bounding = ReactDOM.findDOMNode(
+          this.lastcomp
+        ).getBoundingClientRect();
+        if (bounding.top <= 1000)
+          if (!this.state.fetching)
+            this.getImages(this.props.tag, this.state.numberPerPage + 100);
+      }
+    }, 100);
 
   componentWillReceiveProps(props) {
     if (!this.state.images.length) this.getImages(props.tag);
@@ -66,7 +94,7 @@ class Gallery extends React.Component {
   };
 
   render() {
-    const { onlyFavroites } = this.state;
+    const { onlyFavroites, fetching } = this.state;
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
     return (
       <div className="gallery-root">
@@ -80,10 +108,17 @@ class Gallery extends React.Component {
         >
           {onlyFavroites ? "Show all" : "Show Only Favorites"}
         </button>
+        <div className="loading" style={{ opacity: fetching ? 1 : 0 }}>
+          <FontAwesome name="spinner" className="spinAll" />
+        </div>
         {!onlyFavroites
           ? this.state.images.map((dto, key) => {
               return (
                 <Image
+                  ref={ref =>
+                    key === this.state.images.length - 1 &&
+                    (this.lastcomp = ref)
+                  }
                   key={"image-" + dto.id + key}
                   dto={dto}
                   viewInLarge={() => this.props.viewImageLarge(dto)}
