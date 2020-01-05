@@ -68,7 +68,11 @@ class App extends React.Component {
               />
               <img
                 style={{ width: 500, objectFit: "cover" }}
-                src={`https://farm${imgData.farm}.staticflickr.com/${imgData.server}/${imgData.id}_${imgData.secret}.jpg`}
+                src={
+                  !imgData.src
+                    ? `https://farm${imgData.farm}.staticflickr.com/${imgData.server}/${imgData.id}_${imgData.secret}.jpg`
+                    : URL.createObjectURL(imgData.src)
+                }
               />
             </div>
           </div>

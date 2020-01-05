@@ -21,6 +21,7 @@ class Gallery extends React.Component {
       images: [],
       onlyFavroites: false,
       numberPerPage: 100,
+      tag: "",
       loadingOpacity: 0,
       reOrder: false,
       fetching: false,
@@ -66,6 +67,9 @@ class Gallery extends React.Component {
   };
 
   componentDidMount() {
+    this.setState({
+      tag: this.props.tag
+    });
     this.getImages(this.props.tag);
     this.setState({
       galleryWidth: document.body.clientWidth
@@ -76,10 +80,11 @@ class Gallery extends React.Component {
 
   checkScroll = () =>
     setInterval(() => {
-      if (typeof this.lastcomp !== "undefined") {
+      if (typeof this.lastcomp !== "undefined" && !this.state.onlyFavroites) {
         const bounding = ReactDOM.findDOMNode(
           this.lastcomp
         ).getBoundingClientRect();
+
         if (bounding.top <= 1000)
           if (!this.state.fetching)
             this.getImages(this.props.tag, this.state.numberPerPage + 100);
@@ -88,12 +93,19 @@ class Gallery extends React.Component {
 
   componentWillReceiveProps(props) {
     if (!this.state.images.length) this.getImages(props.tag);
+    else if (props.tag !== this.state.tag) this.getImages(props.tag);
   }
 
-  cloneImage = imgToClone => {
+  cloneImage = (imgToClone, locally) => {
     let newImages = this.state.images;
-
     newImages.unshift(imgToClone);
+
+    this.setState({ images: newImages });
+  };
+
+  deleteImage = imgToDelete => {
+    let newImages = this.state.images;
+    newImages = newImages.filter(img => img.id !== imgToDelete.id);
 
     this.setState({ images: newImages });
   };
@@ -116,13 +128,11 @@ class Gallery extends React.Component {
 
     const SortableItem = sortableElement(({ key, dto }) => (
       <Image
-        ref={ref =>
-          key === this.state.images.length - 1 && (this.lastcomp = ref)
-        }
         key={"image-" + dto.id + key}
         dto={dto}
         viewInLarge={() => this.props.viewImageLarge(dto)}
         duplicateImage={() => this.cloneImage(dto)}
+        deleteImage={() => this.deleteImage(dto)}
         galleryWidth={this.state.galleryWidth}
       />
     ));
@@ -131,7 +141,13 @@ class Gallery extends React.Component {
       return (
         <ul style={{ listStyle: "none" }}>
           {items.map((dto, key) => (
-            <SortableItem disabled={!reOrder} dto={dto} index={key} key={key} />
+            <SortableItem
+              ref={ref => key === items.length - 1 && (this.lastcomp = ref)}
+              disabled={!reOrder}
+              dto={dto}
+              index={key}
+              key={key}
+            />
           ))}
         </ul>
       );
@@ -161,6 +177,49 @@ class Gallery extends React.Component {
             {!reOrder ? "Enable re-order" : "Disable re-order"}
           </button>
         </div>
+
+        <div
+          style={{
+            position: "relative",
+            width: "fit-content",
+            margin: "0px auto"
+          }}
+        >
+          <button
+            onClick={() =>
+              this.setState({
+                reOrder: !reOrder
+              })
+            }
+            className="btnFavorite"
+          >
+            Add your image
+          </button>
+          <input
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              right: 0,
+              opacity: 0,
+              zIndex: 3,
+              cursor: "pointer",
+              left: 0,
+              top: 0,
+              bottom: 0
+            }}
+            type="file"
+            name="file"
+            onChange={({ target }) => {
+              // this.setState({ newImage: target.files[0] });
+              this.cloneImage({
+                title: target.files[0].name,
+                src: target.files[0]
+              });
+            }}
+          />
+        </div>
+
         <div
           className="loading"
           style={{ visibility: fetching ? "visible" : "hidden" }}

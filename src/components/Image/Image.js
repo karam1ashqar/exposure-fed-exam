@@ -89,8 +89,9 @@ class Image extends React.Component {
       <div
         className="image-root"
         style={{
-          zIndex: 100,
-          backgroundImage: `url(${this.urlFromDto(this.props.dto)})`,
+          backgroundImage: !this.props.dto.src
+            ? `url(${this.urlFromDto(this.props.dto)})`
+            : `url(${URL.createObjectURL(this.props.dto.src)})`,
           width: size + "px",
           height: size + "px",
           direction: flippedImage ? "ltr" : "rtl",
@@ -124,6 +125,12 @@ class Image extends React.Component {
             className="image-icon"
             name="expand"
             title="expand"
+          />
+          <FontAwesome
+            onClick={this.props.deleteImage}
+            className="image-icon"
+            name="times-circle"
+            title="remove"
           />
         </div>
         <div
