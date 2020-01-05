@@ -72,7 +72,12 @@ class Image extends React.Component {
             name="clone"
             title="clone"
           />
-          <FontAwesome className="image-icon" name="expand" title="expand" />
+          <FontAwesome
+            onClick={this.props.viewInLarge}
+            className="image-icon"
+            name="expand"
+            title="expand"
+          />
         </div>
       </div>
     );

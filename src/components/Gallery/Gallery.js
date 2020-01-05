@@ -53,7 +53,7 @@ class Gallery extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    this.getImages(props.tag);
+    if (!this.state.images.length) this.getImages(props.tag);
   }
 
   cloneImage = imgToClone => {
@@ -72,6 +72,7 @@ class Gallery extends React.Component {
             <Image
               key={"image-" + dto.id + key}
               dto={dto}
+              viewInLarge={() => this.props.viewImageLarge(dto)}
               duplicateImage={() => this.cloneImage(dto)}
               galleryWidth={this.state.galleryWidth}
             />
