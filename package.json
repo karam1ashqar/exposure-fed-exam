@@ -74,13 +74,15 @@
     "webpack-dev-server": "^1.12.0"
   },
   "dependencies": {
+    "array-move": "^2.2.1",
     "axios": "^0.17.1",
     "core-js": "^2.0.0",
     "node-sass": "^4.7.2",
     "normalize.css": "^4.0.0",
     "react": "^15.0.0",
     "react-dom": "^15.0.0",
-    "react-fontawesome": "^1.6.1"
+    "react-fontawesome": "^1.6.1",
+    "react-sortable-hoc": "^1.10.1"
   },
   "gh-pages-deploy": {
     "staticpath": "dist",

@@ -6,6 +6,10 @@ import Image from "../Image";
 import "./Gallery.scss";
 import ReactDOM from "react-dom";
 
+import { sortableContainer, sortableElement } from "react-sortable-hoc";
+
+import arrayMove from "array-move";
+
 class Gallery extends React.Component {
   static propTypes = {
     tag: PropTypes.string
@@ -93,9 +97,45 @@ class Gallery extends React.Component {
     this.setState({ images: newImages });
   };
 
+  onSortEnd = ({ oldIndex, newIndex }) => {
+    if (this.state.onlyFavroites) {
+      this.setState(({ favorites }) => ({
+        favorites: arrayMove(favorites, oldIndex, newIndex)
+      }));
+    } else {
+      this.setState(({ images }) => ({
+        images: arrayMove(images, oldIndex, newIndex)
+      }));
+    }
+  };
+
   render() {
     const { onlyFavroites, fetching } = this.state;
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    const SortableItem = sortableElement(({ key, dto }) => (
+      <Image
+        ref={ref =>
+          key === this.state.images.length - 1 && (this.lastcomp = ref)
+        }
+        key={"image-" + dto.id + key}
+        dto={dto}
+        viewInLarge={() => this.props.viewImageLarge(dto)}
+        duplicateImage={() => this.cloneImage(dto)}
+        galleryWidth={this.state.galleryWidth}
+      />
+    ));
+
+    const SortableList = sortableContainer(({ items }) => {
+      return (
+        <ul style={{ listStyle: "none" }}>
+          {items.map((dto, key) => (
+            <SortableItem dto={dto} index={key} key={key} />
+          ))}
+        </ul>
+      );
+    });
+
     return (
       <div className="gallery-root">
         <button
@@ -108,36 +148,25 @@ class Gallery extends React.Component {
         >
           {onlyFavroites ? "Show all" : "Show Only Favorites"}
         </button>
-        <div className="loading" style={{ opacity: fetching ? 1 : 0 }}>
+        <div
+          className="loading"
+          style={{ visibility: fetching ? "visible" : "hidden" }}
+        >
           <FontAwesome name="spinner" className="spinAll" />
         </div>
-        {!onlyFavroites
-          ? this.state.images.map((dto, key) => {
-              return (
-                <Image
-                  ref={ref =>
-                    key === this.state.images.length - 1 &&
-                    (this.lastcomp = ref)
-                  }
-                  key={"image-" + dto.id + key}
-                  dto={dto}
-                  viewInLarge={() => this.props.viewImageLarge(dto)}
-                  duplicateImage={() => this.cloneImage(dto)}
-                  galleryWidth={this.state.galleryWidth}
-                />
-              );
-            })
-          : favorites.map((dto, key) => {
-              return (
-                <Image
-                  key={"image-" + dto.id + key}
-                  dto={dto}
-                  viewInLarge={() => this.props.viewImageLarge(dto)}
-                  duplicateImage={() => this.cloneImage(dto)}
-                  galleryWidth={this.state.galleryWidth}
-                />
-              );
-            })}
+        {!onlyFavroites ? (
+          <SortableList
+            axis={"xy"}
+            items={this.state.images}
+            onSortEnd={this.onSortEnd}
+          />
+        ) : (
+          <SortableList
+            axis={"xy"}
+            items={favorites}
+            onSortEnd={this.onSortEnd}
+          />
+        )}
       </div>
     );
   }
