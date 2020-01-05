@@ -58,15 +58,13 @@ class Image extends React.Component {
           }}
         >
           <FontAwesome
-            style={{
-              transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
-            }}
             onClick={this.flipImage}
             className="image-icon"
             name="arrows-alt-h"
             title="flip"
           />
           <FontAwesome
+            onClick={this.props.duplicateImage}
             style={{
               transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
             }}
@@ -74,14 +72,7 @@ class Image extends React.Component {
             name="clone"
             title="clone"
           />
-          <FontAwesome
-            style={{
-              transform: this.state.flippedImage ? "scaleX(-1)" : "scaleX(1)"
-            }}
-            className="image-icon"
-            name="expand"
-            title="expand"
-          />
+          <FontAwesome className="image-icon" name="expand" title="expand" />
         </div>
       </div>
     );
