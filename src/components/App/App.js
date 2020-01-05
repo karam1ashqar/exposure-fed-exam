@@ -49,7 +49,7 @@ class App extends React.Component {
               background: "rgba(0,0,0,0.60)"
             }}
           >
-            <h1>Image Viewer</h1>
+            <h1>{imgData.title}</h1>
             <div
               style={{ width: 500, marginLeft: "auto", marginRight: "auto" }}
             >
